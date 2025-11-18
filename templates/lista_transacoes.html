@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Minhas Transações</h2>
+
+<div class="mb-3">
+    <a href="{% url 'nova_transacao' %}" class="btn btn-primary">Nova Transação</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transacao in transacoes %}
+            <tr>
+                <td>{{ transacao.data }}</td>
+                <td>{{ transacao.descricao }}</td>
+                <td>{{ transacao.get_categoria_display }}</td>
+                <td>
+                    <span class="badge {% if transacao.tipo == 'receita' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ transacao.get_tipo_display }}
+                    </span>
+                </td>
+                <td class="{% if transacao.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+                    R$ {{ transacao.valor }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">Nenhuma transação cadastrada</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
