@@ -38,13 +38,27 @@
             <div class="card-body">
                 {% for transacao in ultimas_transacoes %}
                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
                     <div>
                         <h6 class="mb-0">{{ transacao.descricao }}</h6>
-                        <small class="text-muted">{{ transacao.data }} - {{ transacao.get_categoria_display }}</small>
+                        <small class="text-muted">
+                            {{ transacao.data }} - {{ transacao.get_categoria_display }}
+                        </small>
                     </div>
-                    <span class="{% if transacao.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
-                        R$ {{ transacao.valor }}
-                    </span>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="{% if transacao.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+                            R$ {{ transacao.valor }}
+                        </span>
+
+                        <!-- BOTÃO DE EXCLUIR -->
+                        <a href="{% url 'deletar_transacao' transacao.id %}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Tem certeza que quer excluir essa transação?');">
+                            🗑️
+                        </a>
+                    </div>
+
                 </div>
                 {% empty %}
                 <p class="text-muted text-center">Nenhuma transação cadastrada</p>

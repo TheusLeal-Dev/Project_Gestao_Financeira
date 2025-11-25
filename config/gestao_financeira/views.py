@@ -1,6 +1,6 @@
-# gestao_financeira/views.py - TODAS AS 3 VIEWS JUNTAS NUM ÚNICO ARQUIVO
+# gestao_financeira/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
@@ -20,6 +20,7 @@ def registro(request):
             return redirect('login')
     else:
         form = UserCreationForm()
+
     return render(request, 'registro.html', {'form': form})
 
 
@@ -71,3 +72,11 @@ def nova_transacao(request):
         form = TransacaoForm()
 
     return render(request, 'nova_transacao.html', {'form': form})
+
+
+# VIEW 5 - Deletar transação
+@login_required
+def deletar_transacao(request, id):
+    transacao = get_object_or_404(Transacao, id=id, usuario=request.user)
+    transacao.delete()
+    return redirect('dashboard')
