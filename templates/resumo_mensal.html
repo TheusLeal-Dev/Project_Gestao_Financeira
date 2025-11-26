@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4 text-center">{{ mes }} de {{ ano }}</h2>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Receitas</h5>
+                <h2>R$ {{ total_receitas }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Despesas</h5>
+                <h2>R$ {{ total_despesas }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-white {% if saldo >= 0 %}bg-info{% else %}bg-warning{% endif %} mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Saldo</h5>
+                <h2>R$ {{ saldo }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTÃO VOLTAR -->
+<a href="{% url 'resumo_anual' %}" class="btn btn-secondary mb-3">← Voltar ao Resumo Anual</a>
+
+<div class="card">
+    <div class="card-header">
+        <h5>Transações de {{ mes }}</h5>
+    </div>
+
+    <div class="card-body">
+        {% if transacoes %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transacoes %}
+                <tr>
+                    <td>{{ t.data }}</td>
+                    <td>{{ t.descricao }}</td>
+                    <td>{{ t.get_categoria_display }}</td>
+                    <td>
+                        <span class="{% if t.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+                            {{ t.tipo|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <strong class="{% if t.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+                            R$ {{ t.valor }}
+                        </strong>
+                    </td>
+                    <td>
+                        <a href="{% url 'deletar_transacao' t.id %}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Tem certeza que deseja excluir?');">
+                            🗑️
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <p class="text-muted text-center">Nenhuma transação neste mês.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
