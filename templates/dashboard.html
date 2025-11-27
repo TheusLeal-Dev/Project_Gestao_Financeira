@@ -87,7 +87,7 @@
         </div>
     </div>
 
-    <!-- ÚLTIMAS TRANSAÇÕES -->
+    <!-- ÚLTIMAS TRANSACOES -->
     <div class="col-md-4 mb-4">
         <div class="section-card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -98,7 +98,7 @@
             <div class="card-body">
 
                 {% for transacao in ultimas_transacoes %}
-                <div class="d-flex justify-content-between align-items-center py-3 border-bottom" style="border-color: #333;">
+                <div class="d-flex justify-content-between align-items-center py-3 border-bottom" style="border-color:#333;">
                     <div>
                         <h6 class="mb-0 text-light">{{ transacao.descricao }}</h6>
                         <small class="text-muted">{{ transacao.data }} - {{ transacao.get_categoria_display }}</small>
@@ -157,12 +157,15 @@
     </div>
 </div>
 
-
-<!-- SCRIPT DO GRÁFICO -->
+<!-- SCRIPT DO GRÁFICO (SEM BUGS) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     const ctx = document.getElementById('grafico').getContext('2d');
+
+    const receitas = Number("{{ valores_grafico.receitas|default:0 }}".replace(",", "."));
+    const despesas = Number("{{ valores_grafico.despesas|default:0 }}".replace(",", "."));
+    const investimentos = Number("{{ valores_grafico.investimentos|default:0 }}".replace(",", "."));
 
     new Chart(ctx, {
         type: 'bar',
@@ -170,11 +173,7 @@
             labels: ['Receitas', 'Despesas', 'Investimentos'],
             datasets: [{
                 label: 'Valor (R$)',
-                data: [
-                    {{ valores_grafico.receitas }},
-                    {{ valores_grafico.despesas }},
-                    {{ valores_grafico.investimentos }}
-                ],
+                data: [receitas, despesas, investimentos],
                 borderWidth: 2
             }]
         },
