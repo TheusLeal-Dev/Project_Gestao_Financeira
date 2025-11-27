@@ -28,26 +28,50 @@ def registro(request):
     return render(request, 'registro.html', {'form': form})
 
 
-# VIEW 2 - Dashboard principal
+# VIEW 2 - Dashboard principal (ATUALIZADA)
 @login_required
 def dashboard(request):
     hoje = date.today()
+
+    # FILTRAR TRANSAÇÕES DO MÊS
     transacoes_mes = Transacao.objects.filter(
         usuario=request.user,
         data__month=hoje.month,
         data__year=hoje.year
     )
 
+    # VALORES TOTAIS
     total_receitas = transacoes_mes.filter(tipo='receita').aggregate(Sum('valor'))['valor__sum'] or 0
     total_despesas = transacoes_mes.filter(tipo='despesa').aggregate(Sum('valor'))['valor__sum'] or 0
     saldo = total_receitas - total_despesas
 
+    # 🔥 TOTAL DE INVESTIMENTOS NO MÊS (categoria nova)
+    total_investimentos = transacoes_mes.filter(categoria='investimento').aggregate(Sum('valor'))['valor__sum'] or 0
+
+    # 🔥 GASTO DIÁRIO: soma apenas as despesas do dia
+    gasto_diario = Transacao.objects.filter(
+        usuario=request.user,
+        tipo='despesa',
+        data=hoje
+    ).aggregate(Sum('valor'))['valor__sum'] or 0
+
+    # 🔥 Preparar dados para gráfico simples
+    valores_grafico = {
+        'receitas': float(total_receitas),
+        'despesas': float(total_despesas),
+        'investimentos': float(total_investimentos),
+    }
+
+    # ÚLTIMAS 5 TRANSACOES
     ultimas_transacoes = Transacao.objects.filter(usuario=request.user).order_by('-data')[:5]
 
     context = {
         'total_receitas': total_receitas,
         'total_despesas': total_despesas,
         'saldo': saldo,
+        'total_investimentos': total_investimentos,  # NOVO
+        'gasto_diario': gasto_diario,  # NOVO
+        'valores_grafico': valores_grafico,  # NOVO
         'ultimas_transacoes': ultimas_transacoes,
     }
 
@@ -86,7 +110,7 @@ def deletar_transacao(request, id):
     return redirect('dashboard')
 
 
-# VIEW 6 - Resumo Anual
+# VIEW 6 - Resumo anual
 @login_required
 def resumo_anual(request):
     ano_atual = date.today().year
@@ -113,8 +137,8 @@ def resumo_anual(request):
         ).aggregate(Sum('valor'))['valor__sum'] or 0
 
         dados_mensais.append({
-            'mes_num': mes,                 # <-- número do mês (1 a 12)
-            'mes_nome': meses_nomes[mes-1], # <-- nome do mês
+            'mes_num': mes,
+            'mes_nome': meses_nomes[mes-1],
             'receitas': receitas,
             'despesas': despesas,
             'saldo': receitas - despesas
@@ -123,7 +147,7 @@ def resumo_anual(request):
     return render(request, 'resumo_anual.html', {'dados_mensais': dados_mensais})
 
 
-# VIEW 7 - Resumo Mensal (opcional, caso você use)
+# VIEW 7 - Resumo mensal
 @login_required
 def resumo_mensal(request, ano, mes):
     transacoes = Transacao.objects.filter(
@@ -154,7 +178,7 @@ def resumo_mensal(request, ano, mes):
     return render(request, 'resumo_mensal.html', context)
 
 
-# VIEW 8 - Detalhes do Mês
+# VIEW 8 - Detalhes do mês
 @login_required
 def detalhes_mes(request, mes):
     ano = date.today().year
