@@ -1,100 +1,137 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Receitas</h5>
-                <h2 class="card-text">R$ {{ total_receitas }}</h2>
-            </div>
+
+<style>
+    body {
+        background: #0f0f17 !important;
+        color: white;
+    }
+
+    .dashboard-card {
+        border-radius: 18px;
+        padding: 25px;
+        color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    .bg-receitas { background: #00c292; }
+    .bg-despesas { background: #e74c3c; }
+    .bg-saldo { background: #34495e; }
+
+    .section-card {
+        background: #181820;
+        border-radius: 18px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        color: white;
+    }
+
+    .section-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid #333;
+        color: #ddd;
+        font-weight: bold;
+    }
+
+    .btn-custom {
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 15px;
+    }
+</style>
+
+<h3 class="mb-4">Seja Bem Vindo(a) ao Painel de Controle ✨</h3>
+
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="dashboard-card bg-receitas">
+            <h6>Entradas do Mês</h6>
+            <h2>R$ {{ total_receitas }}</h2>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Despesas</h5>
-                <h2 class="card-text">R$ {{ total_despesas }}</h2>
-            </div>
+    <div class="col-md-4 mb-3">
+        <div class="dashboard-card bg-despesas">
+            <h6>Saídas do Mês</h6>
+            <h2>R$ {{ total_despesas }}</h2>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card text-white {% if saldo >= 0 %}bg-info{% else %}bg-warning{% endif %} mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Saldo</h5>
-                <h2 class="card-text">R$ {{ saldo }}</h2>
-            </div>
+    <div class="col-md-4 mb-3">
+        <div class="dashboard-card bg-saldo">
+            <h6>Saldo Total</h6>
+            <h2>R$ {{ saldo }}</h2>
         </div>
     </div>
+
 </div>
 
-
-<div class="row mt-4">
-    <div class="col-md-8">
-        <div class="card">
+<div class="row">
+    <div class="col-md-8 mb-4">
+        <div class="section-card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>Últimas Transações</h5>
-                <a href="{% url 'nova_transacao' %}" class="btn btn-primary btn-sm">Nova Transação</a>
+                <span>Últimas Transações</span>
+                <a href="{% url 'nova_transacao' %}" class="btn btn-primary btn-sm">Nova</a>
             </div>
 
             <div class="card-body">
+
                 {% for transacao in ultimas_transacoes %}
-                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-
+                <div class="d-flex justify-content-between align-items-center py-3 border-bottom" style="border-color: #333;">
                     <div>
-                        <h6 class="mb-0">{{ transacao.descricao }}</h6>
-                        <small class="text-muted">
-                            {{ transacao.data }} - {{ transacao.get_categoria_display }}
-                        </small>
+                        <h6 class="mb-0 text-light">{{ transacao.descricao }}</h6>
+                        <small class="text-muted">{{ transacao.data }} - {{ transacao.get_categoria_display }}</small>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="{% if transacao.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
+                    <div class="text-end">
+                        <strong class="{% if transacao.tipo == 'receita' %}text-success{% else %}text-danger{% endif %}">
                             R$ {{ transacao.valor }}
-                        </span>
-
-                        <a href="{% url 'deletar_transacao' transacao.id %}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('Tem certeza que quer excluir essa transação?');">
-                            🗑️
-                        </a>
+                        </strong>
+                        <br>
+                        <a href="{% url 'deletar_transacao' transacao.id %}" class="btn btn-sm btn-danger mt-1">🗑️</a>
                     </div>
-
                 </div>
                 {% empty %}
-                <p class="text-muted text-center">Nenhuma transação cadastrada</p>
+                <p class="text-center text-muted">Nenhuma transação cadastrada</p>
                 {% endfor %}
+
             </div>
         </div>
     </div>
 
-
-    <div class="col-md-4">
-        <div class="card">
+    <div class="col-md-4 mb-4">
+        <div class="section-card">
             <div class="card-header">
-                <h5>Ações Rápidas</h5>
+                <span>Ações Rápidas</span>
             </div>
 
             <div class="card-body">
-                <a href="{% url 'nova_transacao' %}?tipo=receita" class="btn btn-success w-100 mb-2">
-                    Nova Receita
+
+                <a href="{% url 'nova_transacao' %}?tipo=receita"
+                   class="btn btn-success w-100 btn-custom mb-2">
+                    ➕ Nova Receita
                 </a>
 
-                <a href="{% url 'nova_transacao' %}?tipo=despesa" class="btn btn-danger w-100 mb-2">
-                    Nova Despesa
+                <a href="{% url 'nova_transacao' %}?tipo=despesa"
+                   class="btn btn-danger w-100 btn-custom mb-2">
+                    ➖ Nova Despesa
                 </a>
 
-                <a href="{% url 'lista_transacoes' %}" class="btn btn-info w-100 mb-2">
-                    Ver Todas
+                <a href="{% url 'lista_transacoes' %}"
+                   class="btn btn-info w-100 btn-custom mb-2">
+                    📄 Ver Todas
                 </a>
 
-                <a href="{% url 'resumo_anual' %}" class="btn btn-warning w-100">
+                <a href="{% url 'resumo_anual' %}"
+                   class="btn btn-warning w-100 btn-custom">
                     📊 Resumo Anual
                 </a>
+
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
