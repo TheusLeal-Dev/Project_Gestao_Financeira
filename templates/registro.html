@@ -1,58 +1,104 @@
-<form method="post">
-    {% csrf_token %}
+{% extends "base.html" %}
 
-    <!-- renderiza erros gerais do form -->
-    {% if form.non_field_errors %}
-    <div class="alert alert-danger">
-        {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-        {% endfor %}
-    </div>
-    {% endif %}
+{% block content %}
 
-    <div class="mb-3">
-        <label for="username" class="form-label">Usuário</label>
-        <input type="text" class="form-control" id="username" name="username"
-               value="{{ form.username.value|default:'' }}"
-               placeholder="Escolha um nome de usuário" required>
-        {% if form.username.errors %}
-        <div class="text-danger small">
-            {% for error in form.username.errors %}
-                {{ error }}
-            {% endfor %}
+<div class="register-bg py-5">
+    <div class="d-flex justify-content-center">
+        <div class="register-card p-4 shadow-lg">
+            <h3 class="text-center mb-4 text-primary fw-bold">Criar Conta</h3>
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Usuário</label>
+                    <input type="text" class="form-control input-blue" name="username"
+                           value="{{ form.username.value|default:'' }}"
+                           placeholder="Escolha um nome de usuário" required>
+                    {% if form.username.errors %}
+                    <div class="text-danger small">
+                        {% for error in form.username.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Senha</label>
+                    <input type="password" class="form-control input-blue" name="password1"
+                           placeholder="Digite uma senha segura" required>
+                    {% if form.password1.errors %}
+                    <div class="text-danger small">
+                        {% for error in form.password1.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Confirmar Senha</label>
+                    <input type="password" class="form-control input-blue" name="password2"
+                           placeholder="Digite a mesma senha novamente" required>
+                    {% if form.password2.errors %}
+                    <div class="text-danger small">
+                        {% for error in form.password2.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button class="btn btn-primary w-100 py-2 btn-blue">
+                    Criar Conta
+                </button>
+            </form>
         </div>
-        {% endif %}
     </div>
+</div>
 
-    <div class="mb-3">
-        <label for="password1" class="form-label">Senha</label>
-        <input type="password" class="form-control" id="password1" name="password1"
-               placeholder="Digite uma senha segura" required>
+<style>
+    .register-bg {
+        background: #eef5ff; /* Azul clarinho elegante */
+        min-height: 80vh;
+        border-radius: 12px;
+    }
 
-        {% if form.password1.errors %}
-        <div class="text-danger small">
-            {% for error in form.password1.errors %}
-                {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+    .register-card {
+        width: 420px;
+        background: white;
+        border-radius: 15px;
+        border: 1px solid #dce7ff;
+    }
 
-    <div class="mb-3">
-        <label for="password2" class="form-label">Confirmar Senha</label>
-        <input type="password" class="form-control" id="password2" name="password2"
-               placeholder="Digite a mesma senha novamente" required>
+    .input-blue {
+        border: 2px solid #c7dcff;
+        transition: .2s;
+    }
 
-        {% if form.password2.errors %}
-        <div class="text-danger small">
-            {% for error in form.password2.errors %}
-                {{ error }}
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+    .input-blue:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    }
 
-    <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
-        Criar Conta
-    </button>
-</form>
+    .btn-blue {
+        background: #1d6cf1;
+        transition: .2s;
+        font-weight: 600;
+    }
+
+    .btn-blue:hover {
+        background: #125ad1;
+    }
+</style>
+
+{% endblock %}
