@@ -113,7 +113,23 @@ def deletar_transacao(request, id):
 # VIEW 6 - Resumo anual
 @login_required
 def resumo_anual(request):
-    ano_atual = date.today().year
+    # Pega TODOS os anos onde o usuário tem transações
+    anos_bd = Transacao.objects.filter(usuario=request.user).dates('data', 'year')
+
+    # Converte de objetos de data para números (ex: 2021, 2022, 2025)
+    anos_disponiveis = sorted({data.year for data in anos_bd})
+
+    # Segurança: se por algum motivo não houver anos (usuário novo)
+    if not anos_disponiveis:
+        ano_selecionado = date.today().year
+    else:
+        # Ano selecionado (GET) ou primeiro ano da lista
+        ano_selecionado = int(request.GET.get("ano", anos_disponiveis[-1]))
+
+        # Garante que o ano sempre exista
+        if ano_selecionado not in anos_disponiveis:
+            ano_selecionado = anos_disponiveis[-1]
+
     dados_mensais = []
 
     meses_nomes = [
@@ -121,31 +137,35 @@ def resumo_anual(request):
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ]
 
-    for mes in range(1, 13):
+    # Monta o relatório para o ano selecionado
+    for mes in range(1, 12 + 1):
         receitas = Transacao.objects.filter(
             usuario=request.user,
             tipo='receita',
-            data__year=ano_atual,
+            data__year=ano_selecionado,
             data__month=mes
         ).aggregate(Sum('valor'))['valor__sum'] or 0
 
         despesas = Transacao.objects.filter(
             usuario=request.user,
             tipo='despesa',
-            data__year=ano_atual,
+            data__year=ano_selecionado,
             data__month=mes
         ).aggregate(Sum('valor'))['valor__sum'] or 0
 
         dados_mensais.append({
             'mes_num': mes,
-            'mes_nome': meses_nomes[mes-1],
+            'mes_nome': meses_nomes[mes - 1],
             'receitas': receitas,
             'despesas': despesas,
             'saldo': receitas - despesas
         })
 
-    return render(request, 'resumo_anual.html', {'dados_mensais': dados_mensais})
-
+    return render(request, 'resumo_anual.html', {
+        'dados_mensais': dados_mensais,
+        'anos_disponiveis': anos_disponiveis,
+        'ano_selecionado': ano_selecionado,
+    })
 
 # VIEW 7 - Resumo mensal
 @login_required

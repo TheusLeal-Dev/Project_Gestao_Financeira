@@ -8,7 +8,23 @@
 <body class="bg-light">
 
 <div class="container mt-5">
+
     <h2 class="text-center mb-4">📊 Resumo Anual</h2>
+
+    <!-- SELECIONAR ANO -->
+    <form method="GET" class="mb-4 d-flex justify-content-center">
+        <select name="ano" class="form-select w-auto me-2">
+            {% for ano in anos_disponiveis %}
+                <option value="{{ ano }}" {% if ano == ano_selecionado %}selected{% endif %}>
+                    {{ ano }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button class="btn btn-primary">Ver</button>
+    </form>
+
+    <h4 class="text-center mb-3">Ano: {{ ano_selecionado }}</h4>
 
     <table class="table table-bordered table-striped text-center">
         <thead class="table-dark">
