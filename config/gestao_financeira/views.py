@@ -7,6 +7,11 @@ from datetime import date
 from calendar import month_name
 from .models import Transacao
 from .forms import TransacaoForm
+from django.contrib.auth import logout
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 
 # VIEW 1 - Registro de usuário

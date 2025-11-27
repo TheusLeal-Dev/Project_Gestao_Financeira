@@ -16,4 +16,6 @@ urlpatterns = [
 
     # Registro
     path('registro/', views.registro, name='registro'),
+
+    path('logout/', views.logout_view, name='logout'),
 ]
